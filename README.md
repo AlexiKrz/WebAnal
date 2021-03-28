@@ -1,5 +1,26 @@
 # WebAnal
 
-> A software program that scans a website and analyses it.
-> 
-![preview](https://i.fiery.me/WHfnN.png)
+A software program that scans a website and analyses it.
+
+## Installation of dependencies
+
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install all of them.
+
+```bash
+pip install tldextract, sty, dnsdumpster
+```
+
+## Usage
+
+```bash
+py __main__.py
+```
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## Proof
+![proof](https://i.fiery.me/PlAmD.png)
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
