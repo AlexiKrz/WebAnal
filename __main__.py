@@ -1,6 +1,8 @@
 import os
 import re
 import socket
+import ctypes
+import traceback
 import tldextract
 from sys import platform
 from sty import ef, fg, rs
@@ -43,8 +45,17 @@ def getHostName(full_url):
 
 def getAllOpenPort(hostname):
     try:
+        between_start = int(input(ef.underl + 'Enter the first port to be scanned (1 minimum):' + rs.u + " " + ef.bold))
+        between_end = int(input(rs.bold_dim + ef.underl + 'Enter the last port to be scanned (65535 maximum):' + rs.u + " " + ef.bold))
+        
         # will scan ports between 1 to 65,535
-        for port in range(1,65535):
+        for port in range(between_start, between_end):
+        
+            if platform == "linux" or platform == "linux2" or platform == "darwin":
+                system("title " + "Port currently scanned: " + str(port))
+            elif platform == "win32":
+                ctypes.windll.kernel32.SetConsoleTitleW("Port currently scanned: " + str(port))
+                
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             socket.setdefaulttimeout(0.1)
               
@@ -53,8 +64,8 @@ def getAllOpenPort(hostname):
             if result == 0:
                 print("Port {} is open".format(port))
             s.close()
-    except Exception:
-        console = False
+    except:
+        traceback.print_exc()
 
 
 def getIPByHostname(hostname):
