@@ -7,7 +7,7 @@ A software program that scans a website and analyses it.
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install all of them.
 
 ```bash
-pip install tldextract, sty, dnsdumpster, cloudscraper
+pip install tldextract, sty, dnsdumpster, cloudscraper, alexa_siterank
 ```
 
 ## Usage
