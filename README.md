@@ -20,7 +20,7 @@ py __main__.py
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## Proof
-![proof](https://i.fiery.me/4Pjte.png)
+![proof](https://i.fiery.me/MeZp3.png)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
