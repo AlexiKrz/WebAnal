@@ -5,6 +5,7 @@ import socket
 import ctypes
 import traceback
 import tldextract
+import cloudscraper
 from sys import platform
 from sty import ef, fg, rs
 from datetime import datetime
@@ -17,8 +18,10 @@ def urlAnalyse(full_url):
     
     Hostname = getHostName(full_url)
     IP = getIPByHostname(Hostname)
+    CMS = checkCMD(Hostname)
     print(rs.bold_dim + "[+] " + ef.underl + "Hostname:" + rs.u + ef.bold + " " + Hostname + rs.bold_dim)
     print("[+] " + ef.underl + "IP:" + rs.u + ef.bold + " " + IP + rs.bold_dim)
+    print("[+] " + ef.underl + "CMS:" + rs.u + ef.bold + " " + CMS + rs.bold_dim)
     hr()
     getAllOpenPort(Hostname)
     hr()
@@ -47,14 +50,36 @@ def getDNSDumpster(Hostname):
         out_result += ("\t[+] Country: " +  results['dns_records']['host'][num]['country'] + "\n")
         out_result += ("\t[+] Provider: " +  results['dns_records']['host'][num]['provider'] + "\n")
         out_result += ("\t[+] AS: " +  results['dns_records']['host'][num]['as'] + "\n")
-        out_result += ("\t[+] Reverse DNS: " +  results['dns_records']['host'][num]['reverse_dns'] + "\n")
+        out_result += ("\t[+] Reverse DNS: " +  results['dns_records']['host'][num]['reverse_dns'])
         if num + 1 != x:
             out_result += ("\n")
         num += 1
 
     print(out_result)
     
+def checkCMD(hostname):
+    scraper = cloudscraper.create_scraper(browser='chrome')
+    CMS = checkWordpress(hostname, scraper)
+    return CMS
     
+def checkWordpress(hostname, scraper):
+    check_wplicense = scraper.get("http://" + hostname + "/license.txt")
+    check_wplogin = scraper.get("http://" + hostname + "/wp-login.php")
+    check_wpadmin = scraper.get("http://" + hostname + "/wp-admin.php")
+    check_wpfeed = scraper.get("http://" + hostname + "/feed")
+    
+    if ((check_wplicense.status_code == 200 and (check_wplicense.text).find("WordPress") != -1) or (check_wplogin.status_code == 200 or check_wpadmin.status_code == 200)):
+        if (check_wpfeed.status_code == 200 and (check_wpfeed.text).find("https://wordpress.org/") != -1):
+            version_wp = ((check_wpfeed.text).split("https://wordpress.org/?v=")[1]).split("</generator>")[0]
+            get_version_infos = ((scraper.get("https://api.wordpress.org/core/stable-check/1.0/").text).split(version_wp + '" : "')[1]).split('"')[0]
+            version_wp = " " + version_wp + " (" + get_version_infos + ")"
+        else:
+            version_wp = ""
+            
+        return "WordPress" + version_wp
+    else:
+        return "not found"
+
 # Function to get URL
 def getURL():
     url = input(ef.underl + 'Enter the url to analyse:' + rs.u + " " + ef.bold)
