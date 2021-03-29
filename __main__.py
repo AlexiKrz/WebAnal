@@ -8,6 +8,7 @@ import tldextract
 import cloudscraper
 from sys import platform
 from sty import ef, fg, rs
+from alexa_siterank import *
 from datetime import datetime
 from dnsdumpster.DNSDumpsterAPI import DNSDumpsterAPI
 
@@ -19,8 +20,10 @@ def urlAnalyse(full_url):
     Hostname = getHostName(full_url)
     IP = getIPByHostname(Hostname)
     CMS = checkCMD(Hostname)
+    Rank = getAlexaRank(Hostname)
     print(rs.bold_dim + "[+] " + ef.underl + "Hostname:" + rs.u + ef.bold + " " + Hostname + rs.bold_dim)
     print("[+] " + ef.underl + "IP:" + rs.u + ef.bold + " " + IP + rs.bold_dim)
+    print("[+] " + ef.underl + "Alexa Rank:" + rs.u + ef.bold + " " + Rank + " (global)" + rs.bold_dim)
     print("[+] " + ef.underl + "CMS:" + rs.u + ef.bold + " " + CMS + rs.bold_dim)
     hr()
     getAllOpenPort(Hostname)
@@ -33,7 +36,10 @@ def urlAnalyse(full_url):
     print(ef.italic + 'Scanning Completed in: ' + str(total) + rs.italic)
     hr()
 
-
+def getAlexaRank(Hostname):
+    rank = getRank(Hostname)
+    return str(rank["rank"]["global"])
+    
 def getDNSDumpster(Hostname):
     results = DNSDumpsterAPI().search(Hostname)
     subs = results['dns_records']['host']
@@ -58,7 +64,7 @@ def getDNSDumpster(Hostname):
     print(out_result)
     
 def checkCMD(hostname):
-    scraper = cloudscraper.create_scraper(browser='chrome')
+    scraper = cloudscraper.create_scraper(browser='chrome', delay=10)
     CMS = checkWordpress(hostname, scraper)
     return CMS
     
@@ -66,9 +72,9 @@ def checkWordpress(hostname, scraper):
     check_wplicense = scraper.get("http://" + hostname + "/license.txt")
     check_wplogin = scraper.get("http://" + hostname + "/wp-login.php")
     check_wpadmin = scraper.get("http://" + hostname + "/wp-admin.php")
-    check_wpfeed = scraper.get("http://" + hostname + "/feed")
     
     if ((check_wplicense.status_code == 200 and (check_wplicense.text).find("WordPress") != -1) or (check_wplogin.status_code == 200 or check_wpadmin.status_code == 200)):
+        check_wpfeed = scraper.get("http://" + hostname + "/feed")
         if (check_wpfeed.status_code == 200 and (check_wpfeed.text).find("https://wordpress.org/") != -1):
             version_wp = ((check_wpfeed.text).split("https://wordpress.org/?v=")[1]).split("</generator>")[0]
             get_version_infos = ((scraper.get("https://api.wordpress.org/core/stable-check/1.0/").text).split(version_wp + '" : "')[1]).split('"')[0]
