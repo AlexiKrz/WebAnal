@@ -20,7 +20,7 @@ def urlAnalyse(full_url):
     
     Hostname = getHostName(full_url)
     IP = getIPByHostname(Hostname)
-    CMS = checkCMD(Hostname)
+    CMS = loadcheckCMS(Hostname)
     Rank = getAlexaRank(Hostname)
     print(rs.bold_dim + "[+] " + ef.underl + "Hostname:" + rs.u + ef.bold + " " + Hostname + rs.bold_dim)
     print("[+] " + ef.underl + "IP:" + rs.u + ef.bold + " " + IP + rs.bold_dim)
@@ -64,13 +64,13 @@ def getDNSDumpster(Hostname):
 
     print(out_result)
     
-def checkCMD(hostname):
+def loadcheckCMS(hostname):
     session = requests.session()
     scraper = cloudscraper.create_scraper(browser='chrome', delay=10, sess=session)
-    CMS = checkWordpress(hostname, scraper)
+    CMS = checkCMS(hostname, scraper)
     return CMS
     
-def checkWordpress(hostname, scraper):
+def checkCMS(hostname, scraper):
     content_page = scraper.get("http://" + hostname + "/")
     check_wplicense = scraper.get("http://" + hostname + "/license.txt")
     check_wplogin = scraper.get("http://" + hostname + "/wp-login.php")
@@ -179,4 +179,3 @@ if __name__ == '__main__':
         os.system('cls')
 
     getURL()
-
