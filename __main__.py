@@ -71,12 +71,12 @@ def checkCMD(hostname):
     return CMS
     
 def checkWordpress(hostname, scraper):
-    check_wp = scraper.get("http://" + hostname + "/")
+    content_page = scraper.get("http://" + hostname + "/")
     check_wplicense = scraper.get("http://" + hostname + "/license.txt")
     check_wplogin = scraper.get("http://" + hostname + "/wp-login.php")
     check_wpadmin = scraper.get("http://" + hostname + "/wp-admin.php")
     
-    if ((check_wplicense.status_code == 200 and (check_wplicense.text).find("WordPress") != -1) or ((check_wplogin.status_code == 200 or check_wpadmin.status_code == 200) and ((check_wplogin.text).find("wordpress") != -1 or (check_wpadmin.text).find("wordpress") != -1)) or (check_wp.status_code == 200 and ((check_wp.text).find("/wp-content/") != -1 or (check_wp.text).find("/wp-includes/") != -1 or (check_wp.text).find("/wp-includes/") != -1))):
+    if ((check_wplicense.status_code == 200 and (check_wplicense.text).find("WordPress") != -1) or ((check_wplogin.status_code == 200 or check_wpadmin.status_code == 200) and ((check_wplogin.text).find("wordpress") != -1 or (check_wpadmin.text).find("wordpress") != -1)) or (content_page.status_code == 200 and ((content_page.text).find("/wp-content/") != -1 or (content_page.text).find("/wp-includes/") != -1 or (content_page.text).find("/wp-includes/") != -1))):
         check_wpfeed = scraper.get("http://" + hostname + "/feed")
         if (check_wpfeed.status_code == 200 and (check_wpfeed.text).find("https://wordpress.org/") != -1):
             version_wp = ((check_wpfeed.text).split("https://wordpress.org/?v=")[1]).split("</generator>")[0]
@@ -91,7 +91,11 @@ def checkWordpress(hostname, scraper):
     if (str(check_shopify.headers)).find("shopify") != -1:
         return "Shopify"
         
-
+    if (content_page.text).find('<meta name="Generator" content="') != -1:
+        return ((content_page.text).split('<meta name="Generator" content="')[1]).split(" (")[0]
+    elif (content_page.text).find('drupal.js') != -1:
+        return "Drupal"
+        
     return "not found"
 
 # Function to get URL
