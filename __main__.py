@@ -76,7 +76,7 @@ def checkWordpress(hostname, scraper):
     check_wplogin = scraper.get("http://" + hostname + "/wp-login.php")
     check_wpadmin = scraper.get("http://" + hostname + "/wp-admin.php")
     
-    if ((check_wplicense.status_code == 200 and (check_wplicense.text).find("WordPress") != -1) or (check_wplogin.status_code == 200 or check_wpadmin.status_code == 200) or (check_wp.status_code == 200 and ((check_wp.text).find("/wp-content/") != -1 or (check_wp.text).find("/wp-includes/") != -1 or (check_wp.text).find("/wp-includes/") != -1))):
+    if ((check_wplicense.status_code == 200 and (check_wplicense.text).find("WordPress") != -1) or ((check_wplogin.status_code == 200 or check_wpadmin.status_code == 200) and ((check_wplogin.text).find("wordpress") != -1 or (check_wpadmin.text).find("wordpress") != -1)) or (check_wp.status_code == 200 and ((check_wp.text).find("/wp-content/") != -1 or (check_wp.text).find("/wp-includes/") != -1 or (check_wp.text).find("/wp-includes/") != -1))):
         check_wpfeed = scraper.get("http://" + hostname + "/feed")
         if (check_wpfeed.status_code == 200 and (check_wpfeed.text).find("https://wordpress.org/") != -1):
             version_wp = ((check_wpfeed.text).split("https://wordpress.org/?v=")[1]).split("</generator>")[0]
