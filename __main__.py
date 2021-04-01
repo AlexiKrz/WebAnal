@@ -3,6 +3,7 @@ import re
 import json
 import socket
 import ctypes
+import requests
 import traceback
 import tldextract
 import cloudscraper
@@ -64,7 +65,8 @@ def getDNSDumpster(Hostname):
     print(out_result)
     
 def checkCMD(hostname):
-    scraper = cloudscraper.create_scraper(browser='chrome', delay=10)
+    session = requests.session()
+    scraper = cloudscraper.create_scraper(browser='chrome', delay=10, sess=session)
     CMS = checkWordpress(hostname, scraper)
     return CMS
     
@@ -83,8 +85,13 @@ def checkWordpress(hostname, scraper):
             version_wp = ""
             
         return "WordPress" + version_wp
-    else:
-        return "not found"
+
+    check_shopify = scraper.get("http://" + hostname + "/admin")
+    if (str(check_shopify.headers)).find("shopify") != -1:
+        return "Shopify"
+        
+
+    return "not found"
 
 # Function to get URL
 def getURL():
