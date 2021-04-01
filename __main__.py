@@ -71,11 +71,12 @@ def checkCMD(hostname):
     return CMS
     
 def checkWordpress(hostname, scraper):
+    check_wp = scraper.get("http://" + hostname + "/")
     check_wplicense = scraper.get("http://" + hostname + "/license.txt")
     check_wplogin = scraper.get("http://" + hostname + "/wp-login.php")
     check_wpadmin = scraper.get("http://" + hostname + "/wp-admin.php")
     
-    if ((check_wplicense.status_code == 200 and (check_wplicense.text).find("WordPress") != -1) or (check_wplogin.status_code == 200 or check_wpadmin.status_code == 200)):
+    if ((check_wplicense.status_code == 200 and (check_wplicense.text).find("WordPress") != -1) or (check_wplogin.status_code == 200 or check_wpadmin.status_code == 200) or (check_wp.status_code == 200 and ((check_wp.text).find("/wp-content/") != -1 or (check_wp.text).find("/wp-includes/") != -1 or (check_wp.text).find("/wp-includes/") != -1))):
         check_wpfeed = scraper.get("http://" + hostname + "/feed")
         if (check_wpfeed.status_code == 200 and (check_wpfeed.text).find("https://wordpress.org/") != -1):
             version_wp = ((check_wpfeed.text).split("https://wordpress.org/?v=")[1]).split("</generator>")[0]
@@ -111,8 +112,13 @@ def getHostName(full_url):
 
 # Function to get open port
 def getAllOpenPort(hostname):
+    choose_getAllOpenPort = str(input(ef.underl + 'Do you want to run a port scan on this site? (Y [default] / N):' + rs.u + " " + ef.bold))
+    if choose_getAllOpenPort == "N" or choose_getAllOpenPort == "n":
+        return
+    else:
+        hr()
     try:
-        between_start = int(input(ef.underl + 'Enter the first port to be scanned (1 minimum):' + rs.u + " " + ef.bold))
+        between_start = int(input(rs.bold_dim + ef.underl + 'Enter the first port to be scanned (1 minimum):' + rs.u + " " + ef.bold))
         between_end = int(input(rs.bold_dim + ef.underl + 'Enter the last port to be scanned (65535 maximum):' + rs.u + " " + ef.bold))
         
         # will scan ports between 1 to 65,535
